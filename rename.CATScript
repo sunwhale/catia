@@ -1,0 +1,39 @@
+Language="VBSCRIPT"
+Sub CATMain()
+
+Set documents1 = CATIA.Documents
+Set drawingDocument1 = documents1.Open("F:\Temp\catia\rename\M03\45.003 锁片\45.003.CATDrawing")
+Set partDocument1 = documents1.Open("F:\Temp\catia\rename\M03\45.003 锁片\45.003.CATPart")
+Set product1 = partDocument1.GetItem("Part1")
+product1.PartNumber = "20106013001 锁片"
+partDocument1.SaveAs "F:\Temp\catia\rename\M03_2\20106013001 锁片\201060130010101.CATPart"
+drawingDocument1.SaveAs "F:\Temp\catia\rename\M03_2\20106013001 锁片\201060130010101.CATDrawing"
+drawingDocument1.ExportData "F:\Temp\catia\rename\M03_2\20106013001 锁片\201060130010101.pdf", "pdf"
+partDocument1.Close
+drawingDocument1.Close
+
+
+Set documents1 = CATIA.Documents
+Set drawingDocument1 = documents1.Open("F:\Temp\catia\rename\M03\45.001 自由涡轮盘\45.001.CATDrawing")
+Set partDocument1 = documents1.Open("F:\Temp\catia\rename\M03\45.001 自由涡轮盘\45.001.CATPart")
+Set product1 = partDocument1.GetItem("Part1")
+product1.PartNumber = "20106004001 自由涡轮盘"
+partDocument1.SaveAs "F:\Temp\catia\rename\M03_2\20106004001 自由涡轮盘\201060040010101.CATPart"
+drawingDocument1.SaveAs "F:\Temp\catia\rename\M03_2\20106004001 自由涡轮盘\201060040010101.CATDrawing"
+drawingDocument1.ExportData "F:\Temp\catia\rename\M03_2\20106004001 自由涡轮盘\201060040010101.pdf", "pdf"
+partDocument1.Close
+drawingDocument1.Close
+
+
+Set documents1 = CATIA.Documents
+Set drawingDocument1 = documents1.Open("F:\Temp\catia\rename\M03\45.002 自由涡轮叶片\45.002 2.CATDrawing")
+Set partDocument1 = documents1.Open("F:\Temp\catia\rename\M03\45.002 自由涡轮叶片\45.002.CATPart")
+Set product1 = partDocument1.GetItem("Part1")
+product1.PartNumber = "20106002001 自由涡轮叶片"
+partDocument1.SaveAs "F:\Temp\catia\rename\M03_2\20106002001 自由涡轮叶片\201060020010101.CATPart"
+drawingDocument1.SaveAs "F:\Temp\catia\rename\M03_2\20106002001 自由涡轮叶片\201060020010101.CATDrawing"
+drawingDocument1.ExportData "F:\Temp\catia\rename\M03_2\20106002001 自由涡轮叶片\201060020010101.pdf", "pdf"
+partDocument1.Close
+drawingDocument1.Close
+
+End Sub
