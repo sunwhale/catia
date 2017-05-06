@@ -38,22 +38,24 @@ class Catia:
         outfile = open('rename.bat', 'w')
         print >>outfile, (r'cnext -batch -macro %s' % catscript_name)
         outfile.close()
-    
-    def creatCATScript(self):
-        old_directory = 'F:\\Temp\\catia\\rename\\M03\\'
-        new_directory = 'F:\\Temp\\catia\\rename\\M03_2\\'
+        
+    def creatTitleblockCATScript(self):
+        old_directory = 'F:\\Temp\\catia\\M01_2\\'
+        new_directory = 'F:\\Temp\\catia\\M01_3\\'
         
         if not os.path.isdir(new_directory):
             os.makedirs(new_directory)
             print 'Create new directory:',new_directory
             
-        name_space_file = 'name_space.csv'
+        name_space_file = 'name_space_m01.csv'
         data = np.genfromtxt(name_space_file, delimiter=',', skip_header=1, dtype=str)
-        part_number_old_array = data[:,1]
+        part_number_old_array = data[:,19]
         part_chinese_name_array = data[:,2]
-        part_directory_new_array = data[:,16]
-        part_number_new_array = data[:,19]
-        product_number_array = data[:,21]
+        part_chinese_material_array = data[:,3]
+        part_english_material_array = data[:,4]
+        part_directory_new_array = data[:,19]
+        part_number_new_array = data[:,22]
+        product_number_array = data[:,24]
         
         filenames = getFiles(old_directory)
         directories = {}
@@ -62,14 +64,6 @@ class Catia:
                 if filename[0] not in directories:
                     directories[filename[0]] = {'CATPart':[],'CATDrawing':[]}
         
-#        for filename in filenames:
-#            if isSuffixFile(filename[1],suffixs=['CATPart','CATDrawing']):
-#                rows_number = getRowsNumber(part_number_old,filename[1])
-#                print filename[1], rows_number
-#                print part_directory_new[rows_number] + ' ' + part_chinese_name[rows_number]
-#                print part_number_new[rows_number]
-#                print 
-
         for directory in directories:
             for filename in filenames:
                 if filename[0] is directory:
@@ -84,31 +78,101 @@ class Catia:
         print >>outfile, 'Sub CATMain()'
 
         for directory in directories:
+#            print directory
+            
             part_name_old = r'%s\%s' % (directory,directories[directory]['CATPart'][0])
             drawing_name_old = r'%s\%s' % (directory,directories[directory]['CATDrawing'][0])
             rows_number = getRowsNumber(part_number_old_array,part_name_old)
             part_name_old = part_name_old.decode('gbk').encode('utf-8')
             drawing_name_old = drawing_name_old.decode('gbk').encode('utf-8')
-            part_number = '%s %s' % (part_directory_new_array[rows_number],part_chinese_name_array[rows_number])
+            part_number = r'%s %s' % (part_directory_new_array[rows_number],part_chinese_name_array[rows_number])
             new_directory_name = '%s%s' % (new_directory,part_number)
-            part_name_new = r'%s\%s.CATPart' % (new_directory_name,part_number_new_array[rows_number])
+            part_name_new = r'%s\%s.CATPart' % (new_directory_name,part_directory_new_array[rows_number])
+            drawing_name_new = r'%s\%s.CATDrawing' % (new_directory_name,part_number_new_array[rows_number])
+            export_suffix = 'pdf'
+            export_name_new= r'%s\%s.%s' % (new_directory_name,part_number_new_array[rows_number],export_suffix)
+            part_chinese_material = part_chinese_material_array[rows_number]
+            part_english_material = part_english_material_array[rows_number]
+            
+            print rows_number
+#            print part_name_old.decode('utf-8').encode('gbk')
+            print drawing_name_old.decode('utf-8').encode('gbk')
+#            print part_number.decode('utf-8').encode('gbk')
+#            print new_directory_name.decode('utf-8').encode('gbk')
+#            print part_name_new.decode('utf-8').encode('gbk')
+            print drawing_name_new.decode('utf-8').encode('gbk')
+            print export_name_new.decode('utf-8').encode('gbk')
+            print part_chinese_material.decode('utf-8').encode('gbk')
+            print part_english_material.decode('utf-8').encode('gbk')
+            print
+            
+        infile = open('GB_Titleblock.CATScript', 'r')
+        list1 = infile.readlines()
+        print list1[:5]
+        infile.close()
+        
+    def creatRenameCATScript(self):
+        old_directory = 'F:\\Temp\\catia\\M01\\'
+        new_directory = 'F:\\Temp\\catia\\M01_2\\'
+        
+        if not os.path.isdir(new_directory):
+            os.makedirs(new_directory)
+            print 'Create new directory:',new_directory
+            
+        name_space_file = 'name_space_m01.csv'
+        data = np.genfromtxt(name_space_file, delimiter=',', skip_header=1, dtype=str)
+        part_number_old_array = data[:,1]
+        part_chinese_name_array = data[:,2]
+        part_directory_new_array = data[:,19]
+        part_number_new_array = data[:,22]
+        product_number_array = data[:,24]
+        
+        filenames = getFiles(old_directory)
+        directories = {}
+        for filename in filenames:
+            if isSuffixFile(filename[1],suffixs=['CATPart','CATDrawing']):
+                if filename[0] not in directories:
+                    directories[filename[0]] = {'CATPart':[],'CATDrawing':[]}
+        
+        for directory in directories:
+            for filename in filenames:
+                if filename[0] is directory:
+                    if isSuffixFile(filename[1],suffixs=['CATPart']):
+                        directories[directory]['CATPart'].append(filename[1])
+                    if isSuffixFile(filename[1],suffixs=['CATDrawing']):
+                        directories[directory]['CATDrawing'].append(filename[1])
+
+        outfile = open('rename.CATScript', 'w')
+        print >>outfile, 'Language=\"VBSCRIPT\"'
+        print >>outfile, 'Sub CATMain()'
+
+        for directory in directories:
+            print directory
+            
+            part_name_old = r'%s\%s' % (directory,directories[directory]['CATPart'][0])
+            drawing_name_old = r'%s\%s' % (directory,directories[directory]['CATDrawing'][0])
+            rows_number = getRowsNumber(part_number_old_array,part_name_old)
+            part_name_old = part_name_old.decode('gbk').encode('utf-8')
+            drawing_name_old = drawing_name_old.decode('gbk').encode('utf-8')
+            part_number = r'%s %s' % (part_directory_new_array[rows_number],part_chinese_name_array[rows_number])
+            new_directory_name = '%s%s' % (new_directory,part_number)
+            part_name_new = r'%s\%s.CATPart' % (new_directory_name,part_directory_new_array[rows_number])
             drawing_name_new = r'%s\%s.CATDrawing' % (new_directory_name,part_number_new_array[rows_number])
             export_suffix = 'pdf'
             export_name_new= r'%s\%s.%s' % (new_directory_name,part_number_new_array[rows_number],export_suffix)
             
-            
-#            print rows_number
-#            print part_name_old
-#            print drawing_name_old
-#            print part_number
-#            print new_directory_name
-#            print part_name_new
-#            print drawing_name_new
-#            print export_name_new
-#            print
+            print rows_number
+            print part_name_old.decode('utf-8').encode('gbk')
+            print drawing_name_old.decode('utf-8').encode('gbk')
+            print part_number.decode('utf-8').encode('gbk')
+            print new_directory_name.decode('utf-8').encode('gbk')
+            print part_name_new.decode('utf-8').encode('gbk')
+            print drawing_name_new.decode('utf-8').encode('gbk')
+            print export_name_new.decode('utf-8').encode('gbk')
+            print
             
             new_directory_name = new_directory_name.decode('utf-8').encode('gbk')
-#            print repr(new_directory_name)
+
             if not os.path.isdir(new_directory_name):
                 os.makedirs(new_directory_name)
                 print 'Create new directory:',new_directory_name.decode('gbk').encode('utf-8')
@@ -148,8 +212,7 @@ drawingDocument1.Close
         print cmd
         os.system(cmd)
 
-
-        
 catia = Catia()
-catia.creatCATScript()
+#catia.creatCATScript()
+catia.creatTitleblockCATScript()
 #catia.creatBatchFile()
