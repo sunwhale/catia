@@ -24,7 +24,7 @@ def isSuffixFile(filename,suffixs=['txt']):
 
 def getRowsNumber(list1,key):
     for index, item in enumerate(list1):
-        if item in key:
+        if item in key and item<>'':
             key_index = index
     return key_index
 
@@ -33,21 +33,23 @@ class Catia:
     Catia类，定义一些函数。
     """
     
-    def creatBatchFile(self):
+    def createBatchFile(self):
         catscript_name = 'rename.CATScript'
         outfile = open('rename.bat', 'w')
         print >>outfile, (r'cnext -batch -macro %s' % catscript_name)
         outfile.close()
         
-    def creatTitleblockCATScript(self):
-        old_directory = 'F:\\Temp\\catia\\M01_2\\'
-        new_directory = 'F:\\Temp\\catia\\M01_3\\'
+    def createTitleblockCATScript(self):
+        batch_outfile = open('create_titleblock.bat', 'w')
+        
+        old_directory = 'F:\\Temp\\catia\\M02_2\\'
+        new_directory = 'F:\\Temp\\catia\\M02_2\\'
         
         if not os.path.isdir(new_directory):
             os.makedirs(new_directory)
             print 'Create new directory:',new_directory
             
-        name_space_file = 'name_space_m01.csv'
+        name_space_file = 'name_space_m02.csv'
         data = np.genfromtxt(name_space_file, delimiter=',', skip_header=1, dtype=str)
         part_number_old_array = data[:,19]
         part_chinese_name_array = data[:,2]
@@ -91,27 +93,57 @@ class Catia:
             drawing_name_new = r'%s\%s.CATDrawing' % (new_directory_name,part_number_new_array[rows_number])
             export_suffix = 'pdf'
             export_name_new= r'%s\%s.%s' % (new_directory_name,part_number_new_array[rows_number],export_suffix)
-            part_chinese_material = part_chinese_material_array[rows_number]
-            part_english_material = part_english_material_array[rows_number]
+            drawing_chinese_material = part_chinese_material_array[rows_number]
+            drawing_english_material = part_english_material_array[rows_number]
+            drawing_chinese_name = part_chinese_name_array[rows_number]
+            drawing_number = part_number_new_array[rows_number]
             
             print rows_number
-#            print part_name_old.decode('utf-8').encode('gbk')
+            print part_name_old.decode('utf-8').encode('gbk')
             print drawing_name_old.decode('utf-8').encode('gbk')
-#            print part_number.decode('utf-8').encode('gbk')
-#            print new_directory_name.decode('utf-8').encode('gbk')
-#            print part_name_new.decode('utf-8').encode('gbk')
+            print part_number.decode('utf-8').encode('gbk')
+            print new_directory_name.decode('utf-8').encode('gbk')
+            print part_name_new.decode('utf-8').encode('gbk')
             print drawing_name_new.decode('utf-8').encode('gbk')
             print export_name_new.decode('utf-8').encode('gbk')
-            print part_chinese_material.decode('utf-8').encode('gbk')
-            print part_english_material.decode('utf-8').encode('gbk')
+            print drawing_chinese_material.decode('utf-8').encode('gbk')
+            print drawing_english_material.decode('utf-8').encode('gbk')
             print
             
-        infile = open('GB_Titleblock.CATScript', 'r')
-        list1 = infile.readlines()
-        print list1[:5]
-        infile.close()
+            infile = open('GB_Titleblock.CATScript', 'r')
+            lines = infile.readlines()
+            infile.close()
+            for i, line in enumerate(lines):
+                if 'Text_18 =' in line:
+                    print line.decode('utf-8').encode('gbk')
+                    lines[i] = '  Text_18 = \"%s\" + vbLf + \"%s\"\n' % (drawing_chinese_material,drawing_english_material)
+                if 'Text_19 =' in line:
+                    print line.decode('utf-8').encode('gbk')
+                    lines[i] = '  Text_19 = \"%s\"\n' % '清华大学'
+                if 'Text_20 =' in line:
+                    print line.decode('utf-8').encode('gbk')
+                    lines[i] = '  Text_20 = \"%s\"\n' % drawing_chinese_name
+                if 'Text_21 =' in line:
+                    print line.decode('utf-8').encode('gbk')
+                    lines[i] = '  Text_21 = \"%s\"\n' % drawing_number
+                if 'drawing_document' in line:
+                    lines[i] = '  Set drawingDocument1 = documents1.Open(\"%s\")\n' % drawing_name_old
+                if 'save_as' in line:
+                    lines[i] = '  drawingDocument1.SaveAs \"%s\"\n' % drawing_name_new
+                if 'export_data' in line:
+                    lines[i] = '  drawingDocument1.ExportData \"%s\", \"%s\"\n' % (export_name_new,export_suffix)
+                    
+            outfile_name = 'GB_Titleblock_%s.CATScript' % drawing_number
+            outfile = open(outfile_name, 'w')
+            for line in lines:
+                outfile.writelines(line)
+            outfile.close()
+            
+            print >>batch_outfile, (r'cnext -batch -macro %s' % outfile_name)
+        batch_outfile.close()
         
-    def creatRenameCATScript(self):
+        
+    def createRenameCATScript(self):
         old_directory = 'F:\\Temp\\catia\\M01\\'
         new_directory = 'F:\\Temp\\catia\\M01_2\\'
         
@@ -213,6 +245,6 @@ drawingDocument1.Close
         os.system(cmd)
 
 catia = Catia()
-#catia.creatCATScript()
-catia.creatTitleblockCATScript()
-#catia.creatBatchFile()
+#catia.createRenameCATScript()
+catia.createTitleblockCATScript()
+#catia.createBatchFile()

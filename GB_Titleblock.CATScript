@@ -53,9 +53,8 @@ Const RevRowHeight = 10
 
 Sub CATMain()
 
-  'Set documents1 = CATIA.Documents
-  'Set drawingDocument1 = documents1.Open("F:\Temp\catia\45.003.CATDrawing")
-  'Set specsAndGeomWindow1 = CATIA.ActiveWindow
+  Set documents1 = CATIA.Documents
+  drawing_document
 
   CATDrw_Deletion
   CATInit
@@ -74,9 +73,9 @@ Sub CATMain()
   End If
   CATExit
 
-  'Set drawingDocument1 = CATIA.ActiveDocument
-  'drawingDocument1.SaveAs "F:\Temp\catia\45.003 2.CATDrawing"
-  'drawingDocument1.ExportData "F:\Temp\catia\1.pdf", "pdf"
+  save_as
+  export_data
+  drawingDocument1.Close
 
 End Sub
 
