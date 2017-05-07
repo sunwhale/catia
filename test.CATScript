@@ -54,7 +54,7 @@ Const RevRowHeight = 10
 Sub CATMain()
 
   Set documents1 = CATIA.Documents
-  drawing_document
+  'Set drawingDocument1 = documents1.Open("F:\Temp\catia\2\M02\20106002001 自由涡轮叶片\201060020010201.CATDrawing")
 
   CATDrw_Deletion
   CATInit
@@ -73,10 +73,10 @@ Sub CATMain()
   End If
   CATExit
 
-  save_as
-  export_data
-  drawingDocument1.Close
-
+  'drawingDocument1.SaveAs "F:\Temp\catia\2\M02\20106002001 自由涡轮叶片\201060020010201.CATDrawing"
+  'drawingDocument1.ExportData "F:\Temp\catia\2\M02\20106002001 自由涡轮叶片\201060020010201.pdf", "pdf"
+  'drawingDocument1.Close
+  'Text.TextProperties.Mirror = catTextHorizontalFlip
 End Sub
 
 Sub CATDrw_Creation()
@@ -440,6 +440,13 @@ Sub CATFrameText(Nb_CM_H As Integer, Nb_CM_V As Integer, Ruler As Integer, Cst_1
 TempPointX=Offset2
 	TempPointY=Limit+Offset2
 
+    'Offset2+16.667*mm          ,Height-Offset2-Limit'
+    'Offset2+16.667*mm+33.333*mm,Height-Offset2-Limit-6.666*mm'
+    Set Text     = DrwTexts.Add("测试", Offset2+33.333*mm,Height-Offset2-Limit-3.333*mm)
+    CATFormatFText "test" , 0
+    Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
+    Text.SetFontSize 0, 0, 5
+
     Set Text     = DrwTexts.Add("档案员", TempPointX+1.2*mm+2.8*mm,TempPointY+6.667*mm-1*mm-0.8*mm            )
     CATFormatFText "Frame_Text_1" , 0
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
@@ -461,7 +468,7 @@ TempPointX=Offset2
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 1.5
     Set Text     = DrwTexts.Add("旧底图总号", TempPointX+3.9*mm+3.5*mm,TempPointY+33.333*mm-1*mm-0.8*mm             )
-    CATFormatFText "Frame_Text_6"  , 0
+    CATFormatFText "Frame_Text_6"  , 180
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 1.5
     Set Text     = DrwTexts.Add("借  通  用", TempPointX+3.7*mm+3.5*mm,TempPointY+43.333*mm-1*mm-0.8*mm             )
@@ -646,10 +653,10 @@ Sub CATTitleBlockText()
   End If
   Text_16 = "共     张     第     张"
   Text_17 = ""
-  Text_18 = "（材料标记）"+vbLf+"你好"
-  Text_19 = "（单位名称）"
-  Text_20 = "（图样名称）"
-  Text_21 = "（图样代号）"
+  Text_18 = "K465" + vbLf + ""
+  Text_19 = "清华大学"
+  Text_20 = "自由涡轮叶片"
+  Text_21 = "201060020010101"
   Text_22 = "kg"
   Text_23 = "1:1"
 
@@ -739,7 +746,7 @@ Set Text     = DrwTexts.Add(Text_18, OH + Col(10) + 22.5       , OV + Row(6)   +
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
 Set Text     = DrwTexts.Add(Text_19, OH + Col(16) + 22.5       , OV + Row(8)   + 9            )
- CATFormatTBText "TitleBlock_Text_19"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_19"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
 Set Text     = DrwTexts.Add(Text_20, OH + Col(16) + 22.5       , OV + Row(4)   + 10            )
@@ -750,6 +757,16 @@ Set Text     = DrwTexts.Add(Text_21, OH + Col(16) + 22.5       , OV   + 9       
  CATFormatTBText "TitleBlock_Text_21"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
+
+
+Set Text     = DrwTexts.Add(Text_21, Offset2+33.333*mm,Height-Offset2-Limit-3.333*mm            )
+    CATFormatTBText "TitleBlock_Text_Number"       , catMiddleCenter , 5
+    Text.TextProperties.Mirror = catTextAllFlip
+    Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
+    Text.SetFontSize 0, 0, 2.5
+
+
+
 Set Text     = DrwTexts.Add(Text_22, OH + Col(14) + 5.5       , OV + Row(2)  + 4.5            )
  CATFormatTBText "TitleBlock_Text_22"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
