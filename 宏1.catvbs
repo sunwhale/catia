@@ -1,0 +1,11 @@
+Sub CATMain()
+
+
+ Set MySheet = CATIA.ActiveDocument.Sheets.ActiveSheet
+
+ Set MyView = MySheet.Views.ActiveView
+
+ Set MyDrawingPicture1 = MyView.Pictures.Add("F:\GitHub\catia\test.png", 100., 50.)
+
+
+End Sub

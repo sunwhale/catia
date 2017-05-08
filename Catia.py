@@ -7,6 +7,7 @@ Created on Fri May 05 11:06:31 2017
 
 import os
 import numpy as np
+import qrcode
 
 def getFiles(path):
     fns=[]
@@ -28,6 +29,10 @@ def getRowsNumber(list1,key):
             key_index = index
     return key_index
 
+
+img=qrcode.make("http://www.baidu.com")
+img.save("./test.png")
+    
 class Catia:
     """
     Catia类，定义一些函数。
@@ -284,8 +289,11 @@ class Catia:
         cmd = cmd.decode('utf-8').encode('gbk')
         print cmd
         os.system(cmd)
+        
+    
+        
 
-catia = Catia()
+#catia = Catia()
 #catia.createRenameCATScript()
-catia.createTitleblockCATScript()
+#catia.createTitleblockCATScript()
 #catia.createBatchFile()
