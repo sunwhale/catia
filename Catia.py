@@ -42,8 +42,8 @@ class Catia:
     def createTitleblockCATScript(self):
         batch_outfile = open('create_titleblock.bat', 'w')
         
-        old_directory = 'F:\\Temp\\catia\\2\\M02\\'
-        new_directory = 'F:\\Temp\\catia\\2\\M02\\'
+        old_directory = 'F:\\Temp\\catia\\2\\M03\\'
+        new_directory = 'F:\\Temp\\catia\\2\\M03\\'
         
         if not os.path.isdir(new_directory):
             os.makedirs(new_directory)
@@ -154,7 +154,7 @@ class Catia:
                         lines[i] = '  Text_20 = \"%s\"\n' % drawing_chinese_name
                     if 'Text_21 =' in line:
                         print line.decode('utf-8').encode('gbk')
-                        lines[i] = '  Text_21 = \"%s\"\n' % drawing_number
+                        lines[i] = '  Text_21 = \"%s\"\n' % drawing_numner_new
                     if 'drawing_document' in line:
                         lines[i] = '  Set drawingDocument1 = documents1.Open(\"%s\")\n' % drawing_name_old
                     if 'save_as' in line:
@@ -162,7 +162,7 @@ class Catia:
                     if 'export_data' in line:
                         lines[i] = '  drawingDocument1.ExportData \"%s\", \"%s\"\n' % (export_name_new,export_suffix)
                         
-                outfile_name = 'GB_Titleblock_%s.CATScript' % drawing_number
+                outfile_name = 'GB_Titleblock_%s.CATScript' % drawing_numner_new
                 outfile = open(outfile_name, 'w')
                 for line in lines:
                     outfile.writelines(line)

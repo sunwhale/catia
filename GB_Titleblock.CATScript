@@ -155,17 +155,17 @@ Sub CATInit()
   Col(16) = - 50*mm
 
 
-  Row(1) = +  7*mm
+  Row(1) = + 7*mm
   Row(2) = + 9*mm
   Row(3) = + 14*mm
-  Row(4) = + 18*mm
-  Row(5) = + 21*mm
+  Row(4) = +  18*mm
+  Row(5) = +  21*mm
   Row(6) = +  28*mm
   Row(7) = + 35*mm
   Row(8) = + 38*mm
   Row(9) = + 42*mm
   Row(10) = + 49*mm
-  Row(11) = +  56*mm
+  Row(11) = + 56*mm
 
 End Sub
 
@@ -187,8 +187,8 @@ Sub CATStandard()
 
   Offset = 5.*mm 'Offset default value = 10.
   If (sheetFormat = CatPaperA0 Or sheetFormat = CatPaperA1 Or sheetFormat = CatPaperUser And _
-      (DrwSheet.GetPaperWidth > 594.*mm Or DrwSheet.GetPaperHeight > 594.*mm)) Then
-    Offset = 20.*mm
+     (DrwSheet.GetPaperWidth > 594.*mm Or DrwSheet.GetPaperHeight > 594.*mm)) Then
+     Offset = 10.*mm
   End If
 
   OH = Width - Offset
@@ -309,8 +309,8 @@ Sub CATFrameStandard(Nb_CM_H As Integer, Nb_CM_V As Integer, Ruler As Integer, C
   '-------------------------------------------------------------------------------
   On Error Resume Next
     Offset2=Offset-5
-TempPointX=Offset2
-	TempPointY=Limit+Offset2
+    TempPointX=Offset2
+    TempPointY=Limit+Offset2
 
 End Sub
 
@@ -319,7 +319,7 @@ Sub CATFrameBorder()
   'How to draw the frame border
   '-------------------------------------------------------------------------------
 
-'draw RightTable
+    'draw RightTable
 
     'draw leftTable   
     Set Line      = Fact.CreateLine(TempPointX,TempPointY+3.333*mm,TempPointX+16.667*mm,TempPointY+3.333*mm)
@@ -437,8 +437,8 @@ Sub CATFrameText(Nb_CM_H As Integer, Nb_CM_V As Integer, Ruler As Integer, Cst_1
   '-------------------------------------------------------------------------------
   On Error Resume Next
     Offset2=Offset-5
-TempPointX=Offset2
-	TempPointY=Limit+Offset2
+    TempPointX=Offset2
+  	TempPointY=Limit+Offset2
 
     Set Text     = DrwTexts.Add("档案员", TempPointX+1.2*mm+2.8*mm,TempPointY+6.667*mm-1*mm-0.8*mm            )
     CATFormatFText "Frame_Text_1" , 0
@@ -469,7 +469,7 @@ TempPointX=Offset2
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 1.5
     Set Text     = DrwTexts.Add("件  登  记", TempPointX+3.7*mm+3.5*mm,TempPointY+40.20*mm-1*mm-0.8*mm             )
-   CATFormatFText "Frame_Text_8" , 0
+    CATFormatFText "Frame_Text_8" , 0
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 1.5
     'CATFormatRBText "RevisionBlock_Text_Rev"          , catMiddleLeft,1.25
@@ -510,9 +510,6 @@ Sub CATTitleBlockFrame()
   'How to draw the title block geometry
   '-------------------------------------------------------------------------------
   On Error Resume Next
-
-
-    
 
     Set Line      = Fact.CreateLine(OH + Col(1), OV         , OH         , OV         )
     Line.Name     = "TitleBlock_Line_Bottom"
@@ -654,111 +651,115 @@ Sub CATTitleBlockText()
   Text_23 = "1:1"
 
   Set Text     = DrwTexts.Add(Text_01, OH + Col(1) + 4.5       , OV + Row(6) + 3.5         )
-   CATFormatTBText "TitleBlock_Text_1"     , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_1"     , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_02, OH + Col(2) + 4.5       , OV + Row(6) + 3.5            )
-  CATFormatTBText "TitleBlock_Text_2"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_2"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_03, OH + Col(4) + 7.5       , OV + Row(6) + 3.5            )
- CATFormatTBText "TitleBlock_Text_3"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_3"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_04, OH + Col(6) + 7.5       , OV + Row(6) + 3.5             )
- CATFormatTBText "TitleBlock_Text_4"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_4"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_05, OH + Col(8) + 5.5       , OV + Row(6) + 3.5            )
- CATFormatTBText "TitleBlock_Text_5"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_5"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_06, OH + Col(9) + 7.5       , OV + Row(6) + 3.5            )
- CATFormatTBText "TitleBlock_Text_6"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_6"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_06, OH + Col(9) + 7.5       , OV + Row(5) + 3.5            )
- CATFormatTBText "TitleBlock_Text_6"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_6"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_06, OH + Col(5) + 7.5       , OV + Row(5) + 3.5            )
- CATFormatTBText "TitleBlock_Text_6"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_6"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-
   Set Text     = DrwTexts.Add(Text_07, OH + Col(1) + 5.5       , OV + Row(5) + 3.5            )
- CATFormatTBText "TitleBlock_Text_7"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_7"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_05, OH + Col(3) + 5.5       , OV + Row(5) + 3.5            )
- CATFormatTBText "TitleBlock_Text_5"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_5"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_05, OH + Col(8) + 5.5       , OV + Row(5) + 3.5            )
- CATFormatTBText "TitleBlock_Text_5"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_5"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_08, OH + Col(7) + 5.5       , OV + Row(5) + 3.5            )
- CATFormatTBText "TitleBlock_Text_8"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_8"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
   Set Text     = DrwTexts.Add(Text_09, OH + Col(1) + 5.5       , OV + Row(1) + 3.5            )
- CATFormatTBText "TitleBlock_Text_9"       , catMiddleCenter , 5
+    CATFormatTBText "TitleBlock_Text_9"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_10, OH + Col(1) + 5.5       , OV  + 3.5            )
- CATFormatTBText "TitleBlock_Text_10"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_10, OH + Col(1) + 5.5       , OV  + 3.5            )
+    CATFormatTBText "TitleBlock_Text_10"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_11, OH + Col(7) + 5.5       , OV  + 3.5            )
- CATFormatTBText "TitleBlock_Text_11"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_11, OH + Col(7) + 5.5       , OV  + 3.5            )
+    CATFormatTBText "TitleBlock_Text_11"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_12, OH + Col(10) + 12.5       , OV + Row(4)  + 5            )
- CATFormatTBText "TitleBlock_Text_12"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_12, OH + Col(10) + 12.5       , OV + Row(4)  + 5            )
+    CATFormatTBText "TitleBlock_Text_12"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_13, OH + Col(14) + 5.5       , OV + Row(4)  + 5            )
- CATFormatTBText "TitleBlock_Text_13"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_13, OH + Col(14) + 5.5       , OV + Row(4)  + 5            )
+    CATFormatTBText "TitleBlock_Text_13"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_14, OH + Col(15) + 5.5       , OV + Row(4)  + 5            )
- CATFormatTBText "TitleBlock_Text_14"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_14, OH + Col(15) + 5.5       , OV + Row(4)  + 5            )
+    CATFormatTBText "TitleBlock_Text_14"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_16, OH + Col(10) + 22.5       , OV   + 4            )
- CATFormatTBText "TitleBlock_Text_16"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_16, OH + Col(10) + 22.5       , OV   + 4            )
+    CATFormatTBText "TitleBlock_Text_16"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_17, OH + Col(1) + 5.5       , OV + Row(3)   + 3.5            )
- CATFormatTBText "TitleBlock_Text_17"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_17, OH + Col(1) + 5.5       , OV + Row(3)   + 3.5            )
+    CATFormatTBText "TitleBlock_Text_17"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_18, OH + Col(10) + 22.5       , OV + Row(6)   + 14            )
- CATFormatTBText "TitleBlock_Text_18"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_18, OH + Col(10) + 22.5       , OV + Row(6)   + 14            )
+    CATFormatTBText "TitleBlock_Text_18"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_19, OH + Col(16) + 22.5       , OV + Row(8)   + 9            )
- CATFormatTBText "TitleBlock_Text_19"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_19, OH + Col(16) + 22.5       , OV + Row(8)   + 9            )
+    CATFormatTBText "TitleBlock_Text_19"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_20, OH + Col(16) + 22.5       , OV + Row(4)   + 10            )
- CATFormatTBText "TitleBlock_Text_20"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_20, OH + Col(16) + 22.5       , OV + Row(4)   + 10            )
+    CATFormatTBText "TitleBlock_Text_20"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_21, OH + Col(16) + 22.5       , OV   + 9            )
- CATFormatTBText "TitleBlock_Text_21"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_21, OH + Col(16) + 22.5       , OV   + 9            )
+    CATFormatTBText "TitleBlock_Text_21"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_22, OH + Col(14) + 5.5       , OV + Row(2)  + 4.5            )
- CATFormatTBText "TitleBlock_Text_22"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_21, Offset2+33.333*mm,Height-Offset2-Limit-3.333*mm            )
+    CATFormatTBText "TitleBlock_Text_Number"       , catMiddleCenter , 5
+    Text.TextProperties.Mirror = catTextHorizontalAndVerticalFlip
+    '设置顶部的编码，文字镜像
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-Set Text     = DrwTexts.Add(Text_23, OH + Col(15) + 5.5       , OV + Row(2)  + 4.5            )
- CATFormatTBText "TitleBlock_Text_23"       , catMiddleCenter , 5
+  Set Text     = DrwTexts.Add(Text_22, OH + Col(14) + 5.5       , OV + Row(2)  + 4.5            )
+    CATFormatTBText "TitleBlock_Text_22"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-
+  Set Text     = DrwTexts.Add(Text_23, OH + Col(15) + 5.5       , OV + Row(2)  + 4.5            )
+    CATFormatTBText "TitleBlock_Text_23"       , catMiddleCenter , 5
+    Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
+    Text.SetFontSize 0, 0, 2.5
 
   CATLinks
 
