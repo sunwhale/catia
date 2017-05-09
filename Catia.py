@@ -7,6 +7,8 @@ Created on Fri May 05 11:06:31 2017
 
 import os
 import numpy as np
+import xlrd
+import xlwt
 import qrcode
 
 def getFiles(path):
@@ -40,15 +42,19 @@ class Catia:
         print >>outfile, (r'cnext -batch -macro %s' % catscript_name)
         outfile.close()
     
-    def createHtml(self):
-        html_directory = 'F:\\Cloud\\wwwroot\\turbine\\'
-        
+    def readExcel(self):
+        # 打开文件
+        workbook = xlrd.open_workbook(r'F:\GitHub\catia\name_space.xlsx')
+
+        # 根据sheet索引或者名称获取sheet内容
+        sheet1 = workbook.sheet_by_name(u'M01单元体')
+        sheet2 = workbook.sheet_by_name(u'M02单元体')
         
     def createTitleblockCATScript(self):
         batch_outfile = open('create_titleblock.bat', 'w')
         
-        old_directory = 'F:\\Temp\\catia\\2\\M02\\'
-        new_directory = 'F:\\Temp\\catia\\2\\M02\\'
+        old_directory = 'F:\\Temp\\catia\\2\\M01\\'
+        new_directory = 'F:\\Temp\\catia\\2\\M01\\'
         
         if not os.path.isdir(new_directory):
             os.makedirs(new_directory)
@@ -175,11 +181,11 @@ class Catia:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>20106012003 拉紧螺栓</title>
+<title>%s</title>
 </head>
 <body>
 
-<table width="100%">"""
+<table width="100%%">""" % part_number
                 print >>outfile,'<tr><td width=\"40%%\"><b>中文名称</b></td>         <td>%s</td></tr>' % part_chinese_name_array[rows_number]
                 print >>outfile,'<tr><td><b>图纸文件编号</b></td>     <td>%s</td></tr>' % drawing_numner_new
                 print >>outfile,'<tr><td><b>对应3D零件编号</b></td>   <td>%s</td></tr>' % part_directory_new_array[rows_number]
