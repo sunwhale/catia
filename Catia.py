@@ -50,6 +50,47 @@ class Catia:
         sheet1 = workbook.sheet_by_name(u'M01单元体')
         sheet2 = workbook.sheet_by_name(u'M02单元体')
         
+        data = {}
+        for sheet in [sheet1]:
+            print sheet.name,sheet.nrows,sheet.ncols
+            header = sheet.row_values(0)
+            for i in range(sheet.ncols):
+                data[header[i]] = sheet.col_values(i)
+                
+        for sheet in [sheet2]:
+            print sheet.name,sheet.nrows,sheet.ncols
+            header = sheet.row_values(0)
+            for i in range(sheet.ncols):
+                data[header[i]] += sheet.col_values(i)
+        
+        
+        print data[u'原始编号']
+        print data[u'中文名称']
+        print data[u'中文材料']
+        print data[u'英文材料']
+        print data[u'装配处']
+        print data[u'页数']
+        print data[u'图纸尺寸']
+        print data[u'任务分配']
+        print data[u'发动机类型']
+        print data[u'发动机类型编号']
+        print data[u'发动机级别']
+        print data[u'发动机级别编号']
+        print data[u'部件分组']
+        print data[u'部件分组编号']
+        print data[u'零件分组']
+        print data[u'零件分组编号']
+        print data[u'零件分组统计']
+        print data[u'零件号']
+        print data[u'三维文件名称']
+        print data[u'页号']
+        print data[u'版本号']
+        print data[u'二维文件名称']
+        print data[u'产品序号']
+        print data[u'产品编号']
+
+
+
     def createTitleblockCATScript(self):
         batch_outfile = open('create_titleblock.bat', 'w')
         
@@ -355,5 +396,6 @@ class Catia:
 
 catia = Catia()
 #catia.createRenameCATScript()
-catia.createTitleblockCATScript()
+#catia.createTitleblockCATScript()
 #catia.createBatchFile()
+catia.readExcel()
