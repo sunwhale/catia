@@ -28,11 +28,7 @@ def getRowsNumber(list1,key):
         if item in key and item<>'':
             key_index = index
     return key_index
-
-
-img=qrcode.make("http://www.baidu.com")
-img.save("./test.png")
-    
+   
 class Catia:
     """
     Catia类，定义一些函数。
@@ -43,12 +39,16 @@ class Catia:
         outfile = open('rename.bat', 'w')
         print >>outfile, (r'cnext -batch -macro %s' % catscript_name)
         outfile.close()
+    
+    def createHtml(self):
+        html_directory = 'F:\\Cloud\\wwwroot\\turbine\\'
+        
         
     def createTitleblockCATScript(self):
         batch_outfile = open('create_titleblock.bat', 'w')
         
-        old_directory = 'F:\\Temp\\catia\\2\\M03\\'
-        new_directory = 'F:\\Temp\\catia\\2\\M03\\'
+        old_directory = 'F:\\Temp\\catia\\2\\M02\\'
+        new_directory = 'F:\\Temp\\catia\\2\\M02\\'
         
         if not os.path.isdir(new_directory):
             os.makedirs(new_directory)
@@ -56,39 +56,48 @@ class Catia:
             
         name_space_file = 'name_space_m01.csv'
         data = np.genfromtxt(name_space_file, delimiter=',', skip_header=1, dtype=str)
-#        part_number_old_array = data[:,19]
-#        part_chinese_name_array = data[:,2]
-#        part_chinese_material_array = data[:,3]
-#        part_english_material_array = data[:,4]
-#        part_directory_new_array = data[:,19]
-#        part_number_new_array = data[:,22]
-#        product_number_array = data[:,24]
-        
-        part_number_old_array_m01 = data[:,19]
-        part_chinese_name_array_m01 = data[:,2]
-        part_chinese_material_array_m01 = data[:,3]
-        part_english_material_array_m01 = data[:,4]
-        part_directory_new_array_m01 = data[:,19]
-        part_number_new_array_m01 = data[:,22]
-        product_number_array_m01 = data[:,24]
 
+        part_number_old_array = list(data[:,19])
+        part_chinese_name_array = list(data[:,2])
+        part_chinese_material_array = list(data[:,3])
+        part_english_material_array = list(data[:,4])
+        
+        paper_size_array = list(data[:,7])
+        engine_type_array = list(data[:,9])
+        engine_level_array = list(data[:,11])
+        engine_component_array = list(data[:,13])
+        engine_element_type_array = list(data[:,15])
+        engine_element_number_array = list(data[:,18])
+        
+        page_number_array = list(data[:,20])
+        version_number_array = list(data[:,21])
+
+        part_directory_new_array = list(data[:,19])
+        part_number_new_array = list(data[:,22])
+        product_number_array = list(data[:,24])
+        del(data)
+        
         name_space_file = 'name_space_m02.csv'
         data = np.genfromtxt(name_space_file, delimiter=',', skip_header=1, dtype=str)
-        part_number_old_array_m02 = data[:,19]
-        part_chinese_name_array_m02 = data[:,2]
-        part_chinese_material_array_m02 = data[:,3]
-        part_english_material_array_m02 = data[:,4]
-        part_directory_new_array_m02 = data[:,19]
-        part_number_new_array_m02 = data[:,22]
-        product_number_array_m02 = data[:,24]
+        part_number_old_array += list(data[:,19])
+        part_chinese_name_array += list(data[:,2])
+        part_chinese_material_array += list(data[:,3])
+        part_english_material_array += list(data[:,4])
         
-        part_number_old_array = list(part_number_old_array_m01) + list(part_number_old_array_m02)
-        part_chinese_name_array = list(part_chinese_name_array_m01) + list(part_chinese_name_array_m02)
-        part_chinese_material_array = list(part_chinese_material_array_m01) + list(part_chinese_material_array_m02)
-        part_english_material_array = list(part_english_material_array_m01) + list(part_english_material_array_m02)
-        part_directory_new_array = list(part_directory_new_array_m01) + list(part_directory_new_array_m02)
-        part_number_new_array = list(part_number_new_array_m01) + list(part_number_new_array_m02)
-        product_number_array = list(product_number_array_m01) + list(product_number_array_m02)
+        paper_size_array += list(data[:,7])
+        engine_type_array += list(data[:,9])
+        engine_level_array += list(data[:,11])
+        engine_component_array += list(data[:,13])
+        engine_element_type_array += list(data[:,15])
+        engine_element_number_array += list(data[:,18])
+        
+        page_number_array += list(data[:,20])
+        version_number_array += list(data[:,21])
+    
+        part_directory_new_array += list(data[:,19])
+        part_number_new_array += list(data[:,22])
+        product_number_array += list(data[:,24])
+        del(data)
         
         filenames = getFiles(old_directory)
         directories = {}
@@ -147,6 +156,49 @@ class Catia:
                 infile = open('GB_Titleblock.CATScript', 'r')
                 lines = infile.readlines()
                 infile.close()
+                
+                script_directory = 'F:\\GitHub\\catia\\createTitleblockCATScript'
+                if not os.path.isdir(script_directory):
+                    os.makedirs(script_directory)
+                    print 'Create new directory:',script_directory
+            
+                qrcode_image_url = 'http://47.93.195.1/%s.htm' % drawing_numner_new
+                qrcode_image = qrcode.make(qrcode_image_url)
+                qrcode_image_full_name = '%s\\%s.png' % (script_directory,drawing_numner_new)
+                qrcode_image.save(qrcode_image_full_name)
+                
+                html_directory = 'F:\\Cloud\\wwwroot\\turbine\\'
+                html_outfile_name = '%s\\%s.htm' % (html_directory,drawing_numner_new)
+                outfile = open(html_outfile_name, 'w')
+                print >>outfile, """<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>20106012003 拉紧螺栓</title>
+</head>
+<body>
+
+<table width="100%">"""
+                print >>outfile,'<tr><td width=\"40%%\"><b>中文名称</b></td>         <td>%s</td></tr>' % part_chinese_name_array[rows_number]
+                print >>outfile,'<tr><td><b>图纸文件编号</b></td>     <td>%s</td></tr>' % drawing_numner_new
+                print >>outfile,'<tr><td><b>对应3D零件编号</b></td>   <td>%s</td></tr>' % part_directory_new_array[rows_number]
+                print >>outfile,'<tr><td><b>发动机类型</b></td>       <td>%s</td></tr>' % engine_type_array[rows_number]
+                print >>outfile,'<tr><td><b>发动机级别</b></td>       <td>%s</td></tr>' % engine_level_array[rows_number]
+                print >>outfile,'<tr><td><b>部件</b></td>             <td>%s</td></tr>' % engine_component_array[rows_number]
+                print >>outfile,'<tr><td><b>零件类型</b></td>         <td>%s</td></tr>' % engine_element_type_array[rows_number]
+                print >>outfile,'<tr><td><b>零件图纸号</b></td>       <td>%s</td></tr>' % engine_element_number_array[rows_number]
+                print >>outfile,'<tr><td><b>纸张大小</b></td>         <td>%s</td></tr>' % paper_size_array[rows_number]
+                print >>outfile,'<tr><td><b>页号</b></td>             <td>%s</td></tr>' % page_number_array[rows_number]
+                print >>outfile,'<tr><td><b>版本号</b></td>           <td>%s</td></tr>' % version_number_array[rows_number]
+                print >>outfile,'<tr><td><b>中文材料</b></td>         <td>%s</td></tr>' % drawing_chinese_material
+                print >>outfile,'<tr><td><b>英文材料</b></td>         <td>%s</td></tr>' % drawing_english_material
+                print >>outfile,"""</table>
+
+</body>
+</html>"""
+                outfile.close()
+                
                 for i, line in enumerate(lines):
                     if 'Text_18 =' in line:
                         print line.decode('utf-8').encode('gbk')
@@ -166,8 +218,10 @@ class Catia:
                         lines[i] = '  drawingDocument1.SaveAs \"%s\"\n' % drawing_name_new
                     if 'export_data' in line:
                         lines[i] = '  drawingDocument1.ExportData \"%s\", \"%s\"\n' % (export_name_new,export_suffix)
+                    if 'Qrcode =' in line:
+                        lines[i] = '  Qrcode = "%s"\n' % (qrcode_image_full_name)
                         
-                outfile_name = 'GB_Titleblock_%s.CATScript' % drawing_numner_new
+                outfile_name = '%s\\GB_Titleblock_%s.CATScript' % (script_directory,drawing_numner_new)
                 outfile = open(outfile_name, 'w')
                 for line in lines:
                     outfile.writelines(line)
@@ -178,8 +232,8 @@ class Catia:
         
         
     def createRenameCATScript(self):
-        old_directory = 'F:\\Temp\\catia\\1\\M02\\'
-        new_directory = 'F:\\Temp\\catia\\2\\M02\\'
+        old_directory = 'F:\\Temp\\catia\\1\\M01\\'
+        new_directory = 'F:\\Temp\\catia\\2\\M01\\'
         
         if not os.path.isdir(new_directory):
             os.makedirs(new_directory)
@@ -293,7 +347,7 @@ class Catia:
     
         
 
-#catia = Catia()
+catia = Catia()
 #catia.createRenameCATScript()
-#catia.createTitleblockCATScript()
+catia.createTitleblockCATScript()
 #catia.createBatchFile()

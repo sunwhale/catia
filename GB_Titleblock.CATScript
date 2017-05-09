@@ -734,24 +734,28 @@ Sub CATTitleBlockText()
     CATFormatTBText "TitleBlock_Text_18"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-  Set Text     = DrwTexts.Add(Text_19, OH + Col(16) + 22.5       , OV + Row(8)   + 9            )
+  Set Text     = DrwTexts.Add(Text_19, OH + Col(16) + 25       , OV + Row(8)   + 9            )
     CATFormatTBText "TitleBlock_Text_19"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-  Set Text     = DrwTexts.Add(Text_20, OH + Col(16) + 22.5       , OV + Row(4)   + 10            )
+
+  Set Text     = DrwTexts.Add(Text_20, OH + Col(16) + 25       , OV + Row(4)   + 10            )
     CATFormatTBText "TitleBlock_Text_20"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
-  Set Text     = DrwTexts.Add(Text_21, OH + Col(16) + 22.5       , OV   + 9            )
+
+  Set Text     = DrwTexts.Add(Text_21, OH + Col(16) + 16       , OV   + 9            )
     CATFormatTBText "TitleBlock_Text_21"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
+
   Set Text     = DrwTexts.Add(Text_21, Offset2+33.333*mm,Height-Offset2-Limit-3.333*mm            )
     CATFormatTBText "TitleBlock_Text_Number"       , catMiddleCenter , 5
     Text.TextProperties.Mirror = catTextHorizontalAndVerticalFlip
     '设置顶部的编码，文字镜像
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
+
   Set Text     = DrwTexts.Add(Text_22, OH + Col(14) + 5.5       , OV + Row(2)  + 4.5            )
     CATFormatTBText "TitleBlock_Text_22"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
@@ -760,6 +764,14 @@ Sub CATTitleBlockText()
     CATFormatTBText "TitleBlock_Text_23"       , catMiddleCenter , 5
     Text.SetFontName      0, 0, "ChangFangSong (TrueType)"
     Text.SetFontSize 0, 0, 2.5
+
+  Qrcode = "*.png"
+  Set MySheet = CATIA.ActiveDocument.Sheets.ActiveSheet
+  Set MyView = MySheet.Views.ActiveView
+  'Set MyDrawingPicture1 = MyView.Pictures.Add("F:\GitHub\catia\test.png", OH+Col(16), OV+Row(8))
+  Set MyDrawingPicture1 = MyView.Pictures.Add(Qrcode, OH+Col(16)+32, OV)
+  MyDrawingPicture1.width = 18
+  MyDrawingPicture1.height = 18
 
   CATLinks
 
