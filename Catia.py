@@ -9,6 +9,7 @@ import os
 import numpy as np
 import xlrd
 import xlwt
+import sys
 import qrcode
 
 def getFiles(path):
@@ -36,17 +37,11 @@ class Catia:
     Catia类，定义一些函数。
     """
     
-    def createBatchFile(self):
-        catscript_name = 'rename.CATScript'
-        outfile = open('rename.bat', 'w')
-        print >>outfile, (r'cnext -batch -macro %s' % catscript_name)
-        outfile.close()
-    
     def readExcel(self):
-        # 打开文件
+#         打开文件
         workbook = xlrd.open_workbook(r'F:\GitHub\catia\name_space.xlsx')
 
-        # 根据sheet索引或者名称获取sheet内容
+#         根据sheet索引或者名称获取sheet内容
         sheet1 = workbook.sheet_by_name(u'M01单元体')
         sheet2 = workbook.sheet_by_name(u'M02单元体')
         
@@ -62,17 +57,29 @@ class Catia:
             header = sheet.row_values(0)
             for i in range(sheet.ncols):
                 data[header[i]] += sheet.col_values(i)[1:]
+
+        for i, item in enumerate(data[u'页数']): # 将数字转化为unicode
+            if item <> '':
+                data[u'页数'][i] = unicode(int(item))
         
+        for i, item in enumerate(data[u'发动机类型编号']): # 将数字转化为unicode
+            if item <> '':
+                data[u'发动机类型编号'][i] = unicode(int(item))
+                
+        for i, item in enumerate(data[u'原始编号']): # 将数字转化为unicode
+            if item <> '':
+                data[u'原始编号'][i] = unicode(item)
+                
 #        print data[u'原始编号']
 #        print data[u'中文名称']
 #        print data[u'中文材料']
 #        print data[u'英文材料']
 #        print data[u'装配处']
-        print data[u'页数']
+#        print data[u'页数']
 #        print data[u'图纸尺寸']
 #        print data[u'任务分配']
 #        print data[u'发动机类型']
-        print data[u'发动机类型编号']
+#        print data[u'发动机类型编号']
 #        print data[u'发动机级别']
 #        print data[u'发动机级别编号']
 #        print data[u'部件分组']
@@ -88,113 +95,112 @@ class Catia:
 #        print data[u'产品序号']
 #        print data[u'产品编号']
 #        print header
-        
+                    
         return header,data
 
-    def createTitleblockCATScript(self):
-        batch_outfile = open('create_titleblock.bat', 'w')
+    def createCATScript(self,catia_directory_dict,rename):
         
-        script_directory = 'F:\\GitHub\\catia\\createTitleblockCATScript'
+        titleblock_batch_outfile_name = 'create_titleblock.bat'
+        titleblock_batch_outfile = open(titleblock_batch_outfile_name, 'w') # 添加标题栏批处理文件
+        
+        rename_batch_outfile_name = 'rename.bat'
+        rename_batch_outfile = open(rename_batch_outfile_name, 'w') # 文件改名批处理文件
+        
+        script_directory = 'F:\\GitHub\\catia\\createCATScript' # 存放CATScript文件夹
+        
+        html_directory = u'F:\\Cloud\\wwwroot\\turbine\\' # 存放html文件夹
+        
         if not os.path.isdir(script_directory):
             os.makedirs(script_directory)
             print 'Create new directory:',script_directory
                         
-        input_code_type = 'gbk'
-        output_code_type = 'gbk'
-        html_code_type = 'utf-8'
+        html_code_type = 'utf-8' # html文件编码
         
-        header,data = self.readExcel()
+        script_code_type = 'utf-8' # CATScript文件编码
         
-        catia_directory_dict = {'F:\\Temp\\catia\\2\\M01\\':'F:\\Temp\\catia\\2\\M01\\',
-                                'F:\\Temp\\catia\\2\\M02\\':'F:\\Temp\\catia\\2\\M02\\'}
+        header,data = self.readExcel() # 读取excel文件数据
         
         for catia_directory in catia_directory_dict.keys():
             old_directory = catia_directory
             new_directory = catia_directory_dict[catia_directory]
-            
-#            print old_directory
-#            print new_directory
-            
+
             if not os.path.isdir(new_directory):
                 os.makedirs(new_directory)
                 print 'Create new directory:',new_directory
             
             filenames = getFiles(old_directory)
+            
             directories = {}
+            
             for filename in filenames:
                 if isSuffixFile(filename[1],suffixs=['CATPart','CATDrawing']):
                     if filename[0] not in directories:
                         directories[filename[0]] = {'CATPart':[],'CATDrawing':[]}
             
-            for directory in directories:
+            for directory in directories.keys():
                 for filename in filenames:
                     if filename[0] is directory:
                         if isSuffixFile(filename[1],suffixs=['CATPart']):
                             directories[directory]['CATPart'].append(filename[1])
                         if isSuffixFile(filename[1],suffixs=['CATDrawing']):
                             directories[directory]['CATDrawing'].append(filename[1])
-        
-            for directory in directories:
-                print directory
+            
+            print directories.keys()
+            for directory in directories.keys()[0:1]:
+#                print directory
                 directories[directory]['CATDrawing'].sort()
-                print directories[directory]['CATDrawing']
+#                print directories[directory]['CATDrawing']
                 for i, drawing_name in enumerate(directories[directory]['CATDrawing']):
                     
                     part_name_old = u'%s\%s' % (directory,directories[directory]['CATPart'][0])
-#                    part_name_old = part_name_old.decode(input_code_type)
-#                    print repr(part_name_old)
-                    print part_name_old
+#                    print part_name_old
                     
                     drawing_name_old = u'%s\%s' % (directory,drawing_name)
                     print drawing_name_old
                     
-                    rows_number = getRowsNumber(data[u'三维文件名称'],part_name_old)
-                    print rows_number
+                    if rename == u'原始编号':
+                        rows_number = getRowsNumber(data[u'原始编号'],part_name_old)
+                    if rename == u'三维文件名称':
+                        rows_number = getRowsNumber(data[u'三维文件名称'],part_name_old)
+#                    print rows_number
                     
-                    part_number = u'%s %s' % (data[u'三维文件名称'][rows_number],data[u'中文名称'][rows_number])
-                    print part_number
+                    part_directory_name = u'%s %s' % (data[u'三维文件名称'][rows_number],data[u'中文名称'][rows_number])
+#                    print 'part_directory_name',part_directory_name
                     
                     
-                    new_directory_name = u'%s%s' % (new_directory,part_number)
-                    print new_directory_name
+                    part_directory_full_name = u'%s%s' % (new_directory,part_directory_name)
+#                    print 'part_directory_full_name',part_directory_full_name
                     
-                    part_name_new = u'%s\%s.CATPart' % (new_directory_name,data[u'三维文件名称'][rows_number])
-                    print part_name_new
+                    part_name_new = u'%s\%s.CATPart' % (part_directory_full_name,data[u'三维文件名称'][rows_number])
+#                    print part_name_new
                     
                     drawing_numner_new = data[u'二维文件名称'][rows_number]
                     drawing_numner_new = unicode(int(drawing_numner_new) + i*100)
-                    print drawing_numner_new
+#                    print drawing_numner_new
 
-                    drawing_name_new = u'%s\%s.CATDrawing' % (new_directory_name,drawing_numner_new)
+                    drawing_name_new = u'%s\%s.CATDrawing' % (part_directory_full_name,drawing_numner_new)
                     print drawing_name_new
                     
                     export_suffix = u'pdf'
-                    export_name_new= u'%s\%s.%s' % (new_directory_name,drawing_numner_new,export_suffix)
-                    print export_name_new
+                    export_name_new= u'%s\%s.%s' % (part_directory_full_name,drawing_numner_new,export_suffix)
+#                    print export_name_new
                     
                     drawing_chinese_material = data[u'中文材料'][rows_number]
-                    print drawing_chinese_material
+#                    print drawing_chinese_material
                     
                     drawing_english_material = data[u'英文材料'][rows_number]
-                    print drawing_english_material
+#                    print drawing_english_material
                     
                     drawing_chinese_name = data[u'中文名称'][rows_number]
-                    print drawing_chinese_name
-
-                    drawing_number = data[u'二维文件名称'][rows_number]
-                    print drawing_number
-
+#                    print drawing_chinese_name
                     
-                    infile = open('GB_Titleblock.CATScript', 'r')
-                    lines = infile.readlines()
-                    infile.close()
+                    if not os.path.isdir(part_directory_full_name):
+                        os.makedirs(part_directory_full_name)
+                        print 'Create new directory:',part_directory_full_name
 
-                    qrcode_image_url = u'http://47.93.195.1/%s.htm' % drawing_numner_new
-                    qrcode_image = qrcode.make(qrcode_image_url)
-                    qrcode_image_full_name = u'%s\\%s.png' % (script_directory,drawing_numner_new)
-                    qrcode_image.save(qrcode_image_full_name)
-                    
-                    html_directory = u'F:\\Cloud\\wwwroot\\turbine\\'
+#==============================================================================
+# 生成html文件
+#==============================================================================
                     html_outfile_name = u'%s\\%s.htm' % (html_directory,drawing_numner_new)
                     html_outfile = open(html_outfile_name, 'w')
 
@@ -207,33 +213,35 @@ class Catia:
 </head>
 <body>
 
-<table width="100%%">""" % part_number
+<table width="100%%">""" % part_directory_name
                     print >>html_outfile,line.encode(html_code_type)
                     
-                    keys = [u'原始编号',
+                    keys = [
+#                            u'原始编号',
                             u'中文名称',
-                            u'中文材料',
-                            u'英文材料',
-                            u'装配处',
-                            u'页数',
-                            u'图纸尺寸',
-                            u'任务分配',
-                            u'发动机类型',
-                            u'发动机类型编号',
-                            u'发动机级别',
-                            u'发动机级别编号',
-                            u'部件分组',
-                            u'部件分组编号',
-                            u'零件分组',
-                            u'零件分组编号',
-                            u'零件分组统计',
-                            u'零件号',
+                            u'二维文件名称',
                             u'三维文件名称',
+#                            u'装配处',
+#                            u'页数',
+#                            u'任务分配',
+                            u'发动机类型',
+#                            u'发动机类型编号',
+                            u'发动机级别',
+#                            u'发动机级别编号',
+                            u'部件分组',
+#                            u'部件分组编号',
+                            u'零件分组',
+#                            u'零件分组编号',
+#                            u'零件分组统计',
+                            u'零件号',
+                            u'图纸尺寸',
                             u'页号',
                             u'版本号',
-                            u'二维文件名称',
-                            u'产品序号',
-                            u'产品编号',]
+                            u'中文材料',
+                            u'英文材料',
+#                            u'产品序号',
+#                            u'产品编号',
+                            ]
                             
                     for key in keys:
                         line = '<tr><td width=\"40%%\"><b>%s</b></td>          <td>%s</td></tr>' % (key,data[key][rows_number])
@@ -246,127 +254,59 @@ class Catia:
                     print >>html_outfile,line.encode(html_code_type)
                     
                     html_outfile.close()
+#==============================================================================
+# 生成标题栏CATScript文件
+#==============================================================================
+                    infile = open('GB_Titleblock.CATScript', 'r')
+                    lines = infile.readlines()
+                    for i, line in enumerate(lines):
+                        lines[i] = line.decode(script_code_type)
+                    infile.close()
+
+                    qrcode_image_url = u'http://47.93.195.1/%s.htm' % drawing_numner_new
+                    qrcode_image = qrcode.make(qrcode_image_url)
+                    qrcode_image_full_name = u'%s\\%s.png' % (script_directory,drawing_numner_new)
+                    qrcode_image.save(qrcode_image_full_name)
                     
                     for i, line in enumerate(lines):
-                        if 'Text_18 =' in line:
-                            print line.decode('utf-8').encode('gbk')
-                            lines[i] = '  Text_18 = \"%s\" + vbLf + \"%s\"\n' % (drawing_chinese_material,drawing_english_material)
-                        if 'Text_19 =' in line:
-                            print line.decode('utf-8').encode('gbk')
-                            lines[i] = '  Text_19 = \"%s\"\n' % '清华大学'
-                        if 'Text_20 =' in line:
-                            print line.decode('utf-8').encode('gbk')
-                            lines[i] = '  Text_20 = \"%s\"\n' % drawing_chinese_name
-                        if 'Text_21 =' in line:
-                            print line.decode('utf-8').encode('gbk')
-                            lines[i] = '  Text_21 = \"%s\"\n' % drawing_numner_new
-                        if 'drawing_document' in line:
-                            lines[i] = '  Set drawingDocument1 = documents1.Open(\"%s\")\n' % drawing_name_old
-                        if 'save_as' in line:
-                            lines[i] = '  drawingDocument1.SaveAs \"%s\"\n' % drawing_name_new
-                        if 'export_data' in line:
-                            lines[i] = '  drawingDocument1.ExportData \"%s\", \"%s\"\n' % (export_name_new,export_suffix)
-                        if 'Qrcode =' in line:
-                            lines[i] = '  Qrcode = "%s"\n' % (qrcode_image_full_name)
-                            
-                    outfile_name = '%s\\GB_Titleblock_%s.CATScript' % (script_directory,drawing_numner_new)
-                    outfile = open(outfile_name, 'w')
-                    for line in lines:
-                        outfile.writelines(line)
-                    outfile.close()
-                    
-                    print >>batch_outfile, (r'cnext -batch -macro %s' % outfile_name)
-        batch_outfile.close()
-        
-        
-    def createRenameCATScript(self):
-        old_directory = 'F:\\Temp\\catia\\1\\M01\\'
-        new_directory = 'F:\\Temp\\catia\\2\\M01\\'
-        
-        if not os.path.isdir(new_directory):
-            os.makedirs(new_directory)
-            print 'Create new directory:',new_directory
-            
-        name_space_file = 'name_space_m01.csv'
-        data = np.genfromtxt(name_space_file, delimiter=',', skip_header=1, dtype=str)
-        part_number_old_array_m01 = data[:,1]
-        part_chinese_name_array_m01 = data[:,2]
-        part_directory_new_array_m01 = data[:,19]
-        part_number_new_array_m01 = data[:,22]
-        product_number_array_m01 = data[:,24]
-        
-        name_space_file = 'name_space_m02.csv'
-        data = np.genfromtxt(name_space_file, delimiter=',', skip_header=1, dtype=str)
-        part_number_old_array_m02 = data[:,1]
-        part_chinese_name_array_m02 = data[:,2]
-        part_directory_new_array_m02 = data[:,19]
-        part_number_new_array_m02 = data[:,22]
-        product_number_array_m02 = data[:,24]
-        
-        part_number_old_array = list(part_number_old_array_m01) + list(part_number_old_array_m02)
-        part_chinese_name_array = list(part_chinese_name_array_m01) + list(part_chinese_name_array_m02)
-        part_directory_new_array = list(part_directory_new_array_m01) + list(part_directory_new_array_m02)
-        part_number_new_array = list(part_number_new_array_m01) + list(part_number_new_array_m02)
-        product_number_array = list(product_number_array_m01) + list(product_number_array_m02)
-        
-        filenames = getFiles(old_directory)
-        directories = {}
-        for filename in filenames:
-            if isSuffixFile(filename[1],suffixs=['CATPart','CATDrawing']):
-                if filename[0] not in directories:
-                    directories[filename[0]] = {'CATPart':[],'CATDrawing':[]}
-        
-        for directory in directories:
-            for filename in filenames:
-                if filename[0] is directory:
-                    if isSuffixFile(filename[1],suffixs=['CATPart']):
-                        directories[directory]['CATPart'].append(filename[1])
-                    if isSuffixFile(filename[1],suffixs=['CATDrawing']):
-                        directories[directory]['CATDrawing'].append(filename[1])
-        
-        outfile = open('rename.CATScript', 'w')
-        print >>outfile, 'Language=\"VBSCRIPT\"'
-        print >>outfile, 'Sub CATMain()'
+                        if u'Text_18 =' in line:
+#                            print line
+                            lines[i] = u'  Text_18 = \"%s\" + vbLf + \"%s\"\n' % (drawing_chinese_material,drawing_english_material)
+                        if u'Text_19 =' in line:
+#                            print line
+                            lines[i] = u'  Text_19 = \"%s\"\n' % u'清华大学'
+                        if u'Text_20 =' in line:
+#                            print line
+                            lines[i] = u'  Text_20 = \"%s\"\n' % drawing_chinese_name
+                        if u'Text_21 =' in line:
+#                            print line
+                            lines[i] = u'  Text_21 = \"%s\"\n' % drawing_numner_new
+                        if u'drawing_document' in line:
+#                            print line
+                            lines[i] = u'  Set drawingDocument1 = documents1.Open(\"%s\")\n' % drawing_name_old
+                        if u'save_as' in line:
+#                            print line
+                            lines[i] = u'  drawingDocument1.SaveAs \"%s\"\n' % drawing_name_new
+                        if u'export_data' in line:
+#                            print line
+                            lines[i] = u'  drawingDocument1.ExportData \"%s\", \"%s\"\n' % (export_name_new,export_suffix)
+                        if u'Qrcode =' in line:
+#                            print line
+                            lines[i] = u'  Qrcode = \"%s\"\n' % (qrcode_image_full_name)
 
-        for directory in directories:
-            print directory
-            directories[directory]['CATDrawing'].sort()
-#            print directories[directory]['CATDrawing']
-            for i, drawing_name in enumerate(directories[directory]['CATDrawing']):
-#                print drawing_name
-#                print i
-                part_name_old = r'%s\%s' % (directory,directories[directory]['CATPart'][0])
-                drawing_name_old = r'%s\%s' % (directory,drawing_name)
-                rows_number = getRowsNumber(part_number_old_array,part_name_old)
-                part_name_old = part_name_old.decode('gbk').encode('utf-8')
-                drawing_name_old = drawing_name_old.decode('gbk').encode('utf-8')
-                part_number = r'%s %s' % (part_directory_new_array[rows_number],part_chinese_name_array[rows_number])
-                new_directory_name = '%s%s' % (new_directory,part_number)
-                part_name_new = r'%s\%s.CATPart' % (new_directory_name,part_directory_new_array[rows_number])
-                drawing_numner_new = part_number_new_array[rows_number]
-                drawing_numner_new = str(int(drawing_numner_new) + i*100)
-                drawing_name_new = r'%s\%s.CATDrawing' % (new_directory_name,drawing_numner_new)
-                export_suffix = 'pdf'
-                export_name_new= r'%s\%s.%s' % (new_directory_name,drawing_numner_new,export_suffix)
-                
-#                print rows_number
-#                print part_name_old.decode('utf-8').encode('gbk')
-#                print drawing_name_old.decode('utf-8').encode('gbk')
-#                print part_number.decode('utf-8').encode('gbk')
-#                print new_directory_name.decode('utf-8').encode('gbk')
-#                print part_name_new.decode('utf-8').encode('gbk')
-#                print drawing_name_new.decode('utf-8').encode('gbk')
-#                print export_name_new.decode('utf-8').encode('gbk')
-#                print
-                
-                new_directory_name = new_directory_name.decode('utf-8').encode('gbk')
-    
-                if not os.path.isdir(new_directory_name):
-                    os.makedirs(new_directory_name)
-#                    print 'Create new directory:',new_directory_name.decode('gbk').encode('utf-8')
-                    print 'Create new directory:',new_directory_name
-                
-                lines = r"""
+                    titleblock_outfile_name = '%s\\GB_Titleblock_%s.CATScript' % (script_directory,drawing_numner_new)
+                    titleblock_outfile = open(titleblock_outfile_name, 'w')
+                    for line in lines:
+                        titleblock_outfile.writelines(line.encode(script_code_type))
+                    titleblock_outfile.close()
+#==============================================================================
+# 生成改名CATScript文件
+#==============================================================================
+                    rename_outfile_name = '%s\\rename_%s.CATScript' % (script_directory,drawing_numner_new)
+                    rename_outfile = open(rename_outfile_name, 'w')
+                    print >>rename_outfile, u'Language=\"VBSCRIPT\"'.encode(html_code_type)
+                    print >>rename_outfile, u'Sub CATMain()'.encode(html_code_type)
+                    lines = u"""
 Set documents1 = CATIA.Documents
 Set drawingDocument1 = documents1.Open("%s")
 Set partDocument1 = documents1.Open("%s")
@@ -377,26 +317,41 @@ drawingDocument1.SaveAs "%s"
 drawingDocument1.ExportData "%s", "%s"
 partDocument1.Close
 drawingDocument1.Close
-""" % (drawing_name_old,part_name_old,part_number,part_name_new,drawing_name_new,export_name_new,export_suffix)
-            
-                print >>outfile, lines
-            
-        print >>outfile, 'End Sub'
-        outfile.close()
-        
-    def rename(self):
-        old_name = 'F:\\Temp\\catia\\rename\\M01\\97.174 安全绳锁头\\99.pdf'
-        new_name = 'F:\\Temp\\catia\\rename\\M01\\97.174 安全绳锁头\\98.pdf'
-        cmd = 'move \"%s\" \"%s\"' % (old_name,new_name)
-        cmd = cmd.decode('utf-8').encode('gbk')
-        print cmd
-        os.system(cmd)
-        
-    
-        
+""" % (drawing_name_old,part_name_old,part_directory_name,part_name_new,drawing_name_new,export_name_new,export_suffix)
+                    print >>rename_outfile, lines.encode(html_code_type)
+                    print >>rename_outfile, u'End Sub'.encode(html_code_type)
+                    rename_outfile.close()
+#==============================================================================
+# 写入批处理文件
+#==============================================================================
+                    print >>titleblock_batch_outfile, (r'cnext -batch -macro %s' % titleblock_outfile_name)
+                    print >>rename_batch_outfile, (r'cnext -batch -macro %s' % rename_outfile_name)
+                    print
+                    
+        titleblock_batch_outfile.close()
+        rename_batch_outfile.close()
+        return titleblock_batch_outfile_name,rename_batch_outfile_name
 
+#==============================================================================
+# main
+#==============================================================================
+catia_directory_dict = {
+                        u'F:\\Temp\\catia\\3\\M01\\':u'F:\\Temp\\catia\\3\\M01\\',
+                        u'F:\\Temp\\catia\\3\\M02\\':u'F:\\Temp\\catia\\3\\M02\\',
+                        } # 字典 old_directory:new_directory
+
+#catia_directory_dict = {
+#                        u'F:\\Temp\\catia\\3\\M02\\20106014003 回油接管嘴\\':u'F:\\Temp\\catia\\3\\M02\\20106014003 回油接管嘴\\',
+#                        } # 字典 old_directory:new_directory
+                        
+#catia_directory_dict = {
+#                        u'F:\\Temp\\catia\\1\\M01\\':u'F:\\Temp\\catia\\3\\M01\\',
+#                        u'F:\\Temp\\catia\\1\\M02\\':u'F:\\Temp\\catia\\3\\M02\\',
+#                        } # 字典 old_directory:new_directory
+                        
 catia = Catia()
-#catia.createRenameCATScript()
-#catia.createTitleblockCATScript()
-#catia.createBatchFile()
-catia.readExcel()
+#titleblock_batch_outfile_name,rename_batch_outfile_name = catia.createCATScript(catia_directory_dict,u'原始编号') # 从原始编号检索
+titleblock_batch_outfile_name,rename_batch_outfile_name = catia.createCATScript(catia_directory_dict,u'三维文件名称') # 从新编号检索
+#catia.readExcel()
+#print rename_batch_outfile_name
+#os.system(rename_batch_outfile_name)
