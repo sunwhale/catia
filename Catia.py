@@ -100,23 +100,32 @@ class Catia:
 
     def createCATScript(self,catia_directory_dict,rename):
         
-        titleblock_batch_outfile_name = 'create_titleblock.bat'
+        debug_directory = 'F:\\GitHub\\catia\\debug\\'
+                
+        script_directory = debug_directory + 'CATScript\\' # 存放CATScript文件夹
+        
+        html_directory = debug_directory + 'html\\' # 存放html文件夹
+        
+        qrcode_directory = debug_directory + 'qrcode\\' # 存放html文件夹
+        
+        all_directory = [debug_directory,script_directory,html_directory,qrcode_directory]
+        
+        for directory in all_directory:
+            if not os.path.isdir(directory):
+                os.makedirs(directory)
+                print 'Create new directory:',directory
+
+        titleblock_script_template_file_name = 'F:\\GitHub\\catia\\GB_Titleblock.CATScript'
+        
+        titleblock_batch_outfile_name = debug_directory + 'create_titleblock.bat'
         titleblock_batch_outfile = open(titleblock_batch_outfile_name, 'w') # 添加标题栏批处理文件
         
-        rename_batch_outfile_name = 'rename.bat'
+        rename_batch_outfile_name = debug_directory + 'rename.bat'
         rename_batch_outfile = open(rename_batch_outfile_name, 'w') # 文件改名批处理文件
         
-        script_directory = 'F:\\GitHub\\catia\\createCATScript' # 存放CATScript文件夹
-        
-        html_directory = u'F:\\Cloud\\wwwroot\\turbine\\' # 存放html文件夹
-        
-        if not os.path.isdir(script_directory):
-            os.makedirs(script_directory)
-            print 'Create new directory:',script_directory
-                        
         html_code_type = 'utf-8' # html文件编码
-        
         script_code_type = 'utf-8' # CATScript文件编码
+        cmd_code_type = 'gbk' # cmd文件编码
         
         header,data = self.readExcel() # 读取excel文件数据
         
@@ -145,8 +154,7 @@ class Catia:
                         if isSuffixFile(filename[1],suffixs=['CATDrawing']):
                             directories[directory]['CATDrawing'].append(filename[1])
             
-            print directories.keys()
-            for directory in directories.keys()[0:1]:
+            for directory in directories.keys()[:]:
 #                print directory
                 directories[directory]['CATDrawing'].sort()
 #                print directories[directory]['CATDrawing']
@@ -156,7 +164,7 @@ class Catia:
 #                    print part_name_old
                     
                     drawing_name_old = u'%s\%s' % (directory,drawing_name)
-                    print drawing_name_old
+#                    print drawing_name_old
                     
                     if rename == u'原始编号':
                         rows_number = getRowsNumber(data[u'原始编号'],part_name_old)
@@ -179,7 +187,7 @@ class Catia:
 #                    print drawing_numner_new
 
                     drawing_name_new = u'%s\%s.CATDrawing' % (part_directory_full_name,drawing_numner_new)
-                    print drawing_name_new
+                    print drawing_name_new.encode('gbk')
                     
                     export_suffix = u'pdf'
                     export_name_new= u'%s\%s.%s' % (part_directory_full_name,drawing_numner_new,export_suffix)
@@ -257,7 +265,7 @@ class Catia:
 #==============================================================================
 # 生成标题栏CATScript文件
 #==============================================================================
-                    infile = open('GB_Titleblock.CATScript', 'r')
+                    infile = open(titleblock_script_template_file_name, 'r')
                     lines = infile.readlines()
                     for i, line in enumerate(lines):
                         lines[i] = line.decode(script_code_type)
@@ -265,7 +273,7 @@ class Catia:
 
                     qrcode_image_url = u'http://47.93.195.1/%s.htm' % drawing_numner_new
                     qrcode_image = qrcode.make(qrcode_image_url)
-                    qrcode_image_full_name = u'%s\\%s.png' % (script_directory,drawing_numner_new)
+                    qrcode_image_full_name = u'%s%s.png' % (qrcode_directory,drawing_numner_new)
                     qrcode_image.save(qrcode_image_full_name)
                     
                     for i, line in enumerate(lines):
@@ -294,7 +302,7 @@ class Catia:
 #                            print line
                             lines[i] = u'  Qrcode = \"%s\"\n' % (qrcode_image_full_name)
 
-                    titleblock_outfile_name = '%s\\GB_Titleblock_%s.CATScript' % (script_directory,drawing_numner_new)
+                    titleblock_outfile_name = '%sGB_Titleblock_%s.CATScript' % (script_directory,drawing_numner_new)
                     titleblock_outfile = open(titleblock_outfile_name, 'w')
                     for line in lines:
                         titleblock_outfile.writelines(line.encode(script_code_type))
@@ -302,11 +310,12 @@ class Catia:
 #==============================================================================
 # 生成改名CATScript文件
 #==============================================================================
-                    rename_outfile_name = '%s\\rename_%s.CATScript' % (script_directory,drawing_numner_new)
+                    rename_outfile_name = '%srename_%s.CATScript' % (script_directory,drawing_numner_new)
                     rename_outfile = open(rename_outfile_name, 'w')
                     print >>rename_outfile, u'Language=\"VBSCRIPT\"'.encode(html_code_type)
                     print >>rename_outfile, u'Sub CATMain()'.encode(html_code_type)
                     lines = u"""
+CATIA.DisplayFileAlerts = False
 Set documents1 = CATIA.Documents
 Set drawingDocument1 = documents1.Open("%s")
 Set partDocument1 = documents1.Open("%s")
@@ -348,10 +357,11 @@ catia_directory_dict = {
 #                        u'F:\\Temp\\catia\\1\\M01\\':u'F:\\Temp\\catia\\3\\M01\\',
 #                        u'F:\\Temp\\catia\\1\\M02\\':u'F:\\Temp\\catia\\3\\M02\\',
 #                        } # 字典 old_directory:new_directory
-                        
+      
 catia = Catia()
 #titleblock_batch_outfile_name,rename_batch_outfile_name = catia.createCATScript(catia_directory_dict,u'原始编号') # 从原始编号检索
 titleblock_batch_outfile_name,rename_batch_outfile_name = catia.createCATScript(catia_directory_dict,u'三维文件名称') # 从新编号检索
 #catia.readExcel()
 #print rename_batch_outfile_name
 #os.system(rename_batch_outfile_name)
+raw_input("Enter enter key to exit...") 
