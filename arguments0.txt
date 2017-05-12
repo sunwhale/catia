@@ -1,13 +1,11 @@
-﻿*debug_directory: 脚本文件生成目录。
+*debug_directory: 脚本文件生成目录。
 F:\GitHub\catia\debug\
 
 *titleblock_script_template_file_name: 标题栏模板脚本文件。
-.\GB_Titleblock.CATScript
-#F:\GitHub\catia\GB_Titleblock.CATScript
+F:\GitHub\catia\GB_Titleblock.CATScript
 
 *excel_file_name: 命名excel文件。
-.\name_space.xlsx
-#F:\GitHub\catia\name_space.xlsx
+F:\GitHub\catia\name_space.xlsx
 
 *catia_root_directory_dict: 存放catia文件的“根”目录（1.老目录，2.新目录，两个目录可以相同）。
 F:\Temp\catia\3\M01\,F:\Temp\catia\3\M01\
