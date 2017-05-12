@@ -36,10 +36,59 @@ class Catia:
     """
     Catia类，定义一些函数。
     """
-    
+    def __init__(self, input_file_name):
+        
+        infile = open(input_file_name, 'r')
+        lines = infile.readlines()
+        infile.close()
+        
+        web_url = '47.93.195.1'
+        catia_root_directory_dict = {}
+        catia_sub_directory_dict = {}
+        debug_directory = '.\\debug\\'
+        titleblock_script_template_file_name = 'GB_Titleblock.CATScript'
+        excel_file_name = 'name_space.xlsx'
+        rename = False
+        
+        for i, line in enumerate(lines):
+            if '#' not in line:
+                if '*debug_directory' in line:
+                    debug_directory = lines[i+1].replace('\n','')
+                    
+                if '*titleblock_script_template_file_name' in line:
+                    titleblock_script_template_file_name = lines[i+1].replace('\n','')
+                    
+                if '*excel_file_name' in line:
+                    excel_file_name = lines[i+1].replace('\n','')
+                    
+                if '*catia_root_directory_dict' in line:
+                    tmp = lines[i+1].replace('\n','').split(',')
+                    catia_root_directory_dict[unicode(tmp[0])] = unicode(tmp[1])
+                    
+                if '*catia_sub_directory_dict' in line:
+                    tmp = lines[i+1].replace('\n','').split(',')
+                    catia_sub_directory_dict[unicode(tmp[0])] = unicode(tmp[1])
+                    
+                if '*web_url' in line:
+                    web_url = lines[i+1].replace('\n','')
+                    
+                if '*rename' in line:
+                    tmp = int(lines[i+1].replace('\n',''))
+                    rename = bool(tmp)
+        
+        self.excel_file_name = excel_file_name
+        self.debug_directory = debug_directory
+        self.titleblock_script_template_file_name = titleblock_script_template_file_name
+        self.catia_root_directory_dict = catia_root_directory_dict
+        self.catia_sub_directory_dict = catia_sub_directory_dict
+        self.rename = rename
+        self.web_url = web_url
+        
     def readExcel(self):
 #         打开文件
-        workbook = xlrd.open_workbook(r'F:\GitHub\catia\name_space.xlsx')
+        excel_file_name = self.excel_file_name
+        
+        workbook = xlrd.open_workbook(excel_file_name)
 
 #         根据sheet索引或者名称获取sheet内容
         sheet1 = workbook.sheet_by_name(u'M01单元体')
@@ -73,7 +122,7 @@ class Catia:
 #        print data[u'原始编号']
 #        print data[u'中文名称']
 #        print data[u'中文材料']
-#        print data[u'英文材料']
+#        print data[u'材料标准']
 #        print data[u'装配处']
 #        print data[u'页数']
 #        print data[u'图纸尺寸']
@@ -98,9 +147,17 @@ class Catia:
                     
         return header,data
 
-    def createCATScript(self,catia_directory_dict,rename):
+    def createCATScript(self):
         
-        debug_directory = 'F:\\GitHub\\catia\\debug\\'
+        debug_directory = self.debug_directory
+        
+        catia_root_directory_dict = self.catia_root_directory_dict
+        
+        titleblock_script_template_file_name = self.titleblock_script_template_file_name 
+        
+        rename = self.rename
+        
+        web_url = self.web_url
                 
         script_directory = debug_directory + 'CATScript\\' # 存放CATScript文件夹
         
@@ -114,9 +171,7 @@ class Catia:
             if not os.path.isdir(directory):
                 os.makedirs(directory)
                 print 'Create new directory:',directory
-
-        titleblock_script_template_file_name = 'F:\\GitHub\\catia\\GB_Titleblock.CATScript'
-        
+                
         titleblock_batch_outfile_name = debug_directory + 'create_titleblock.bat'
         titleblock_batch_outfile = open(titleblock_batch_outfile_name, 'w') # 添加标题栏批处理文件
         
@@ -129,9 +184,9 @@ class Catia:
         
         header,data = self.readExcel() # 读取excel文件数据
         
-        for catia_directory in catia_directory_dict.keys():
+        for catia_directory in catia_root_directory_dict.keys():
             old_directory = catia_directory
-            new_directory = catia_directory_dict[catia_directory]
+            new_directory = catia_root_directory_dict[catia_directory]
 
             if not os.path.isdir(new_directory):
                 os.makedirs(new_directory)
@@ -166,9 +221,9 @@ class Catia:
                     drawing_name_old = u'%s\%s' % (directory,drawing_name)
 #                    print drawing_name_old
                     
-                    if rename == u'原始编号':
+                    if rename == True:
                         rows_number = getRowsNumber(data[u'原始编号'],part_name_old)
-                    if rename == u'三维文件名称':
+                    if rename == False:
                         rows_number = getRowsNumber(data[u'三维文件名称'],part_name_old)
 #                    print rows_number
                     
@@ -187,7 +242,8 @@ class Catia:
 #                    print drawing_numner_new
 
                     drawing_name_new = u'%s\%s.CATDrawing' % (part_directory_full_name,drawing_numner_new)
-                    print drawing_name_new.encode('gbk')
+                    print drawing_name_new.encode(cmd_code_type)
+#                    print repr(drawing_name_new)
                     
                     export_suffix = u'pdf'
                     export_name_new= u'%s\%s.%s' % (part_directory_full_name,drawing_numner_new,export_suffix)
@@ -196,8 +252,8 @@ class Catia:
                     drawing_chinese_material = data[u'中文材料'][rows_number]
 #                    print drawing_chinese_material
                     
-                    drawing_english_material = data[u'英文材料'][rows_number]
-#                    print drawing_english_material
+                    drawing_material_standard = data[u'材料标准'][rows_number]
+#                    print drawing_material_standard
                     
                     drawing_chinese_name = data[u'中文名称'][rows_number]
 #                    print drawing_chinese_name
@@ -246,7 +302,7 @@ class Catia:
                             u'页号',
                             u'版本号',
                             u'中文材料',
-                            u'英文材料',
+                            u'材料标准',
 #                            u'产品序号',
 #                            u'产品编号',
                             ]
@@ -271,7 +327,7 @@ class Catia:
                         lines[i] = line.decode(script_code_type)
                     infile.close()
 
-                    qrcode_image_url = u'http://47.93.195.1/%s.htm' % drawing_numner_new
+                    qrcode_image_url = u'http://%s/%s.htm' % (web_url,drawing_numner_new)
                     qrcode_image = qrcode.make(qrcode_image_url)
                     qrcode_image_full_name = u'%s%s.png' % (qrcode_directory,drawing_numner_new)
                     qrcode_image.save(qrcode_image_full_name)
@@ -279,7 +335,7 @@ class Catia:
                     for i, line in enumerate(lines):
                         if u'Text_18 =' in line:
 #                            print line
-                            lines[i] = u'  Text_18 = \"%s\" + vbLf + \"%s\"\n' % (drawing_chinese_material,drawing_english_material)
+                            lines[i] = u'  Text_18 = \"%s\" + vbLf + \"%s\"\n' % (drawing_chinese_material,drawing_material_standard)
                         if u'Text_19 =' in line:
 #                            print line
                             lines[i] = u'  Text_19 = \"%s\"\n' % u'清华大学'
@@ -339,29 +395,10 @@ drawingDocument1.Close
                     
         titleblock_batch_outfile.close()
         rename_batch_outfile.close()
-        return titleblock_batch_outfile_name,rename_batch_outfile_name
-
 #==============================================================================
 # main
 #==============================================================================
-catia_directory_dict = {
-                        u'F:\\Temp\\catia\\3\\M01\\':u'F:\\Temp\\catia\\3\\M01\\',
-                        u'F:\\Temp\\catia\\3\\M02\\':u'F:\\Temp\\catia\\3\\M02\\',
-                        } # 字典 old_directory:new_directory
-
-#catia_directory_dict = {
-#                        u'F:\\Temp\\catia\\3\\M02\\20106014003 回油接管嘴\\':u'F:\\Temp\\catia\\3\\M02\\20106014003 回油接管嘴\\',
-#                        } # 字典 old_directory:new_directory
-                        
-#catia_directory_dict = {
-#                        u'F:\\Temp\\catia\\1\\M01\\':u'F:\\Temp\\catia\\3\\M01\\',
-#                        u'F:\\Temp\\catia\\1\\M02\\':u'F:\\Temp\\catia\\3\\M02\\',
-#                        } # 字典 old_directory:new_directory
-      
-catia = Catia()
-#titleblock_batch_outfile_name,rename_batch_outfile_name = catia.createCATScript(catia_directory_dict,u'原始编号') # 从原始编号检索
-titleblock_batch_outfile_name,rename_batch_outfile_name = catia.createCATScript(catia_directory_dict,u'三维文件名称') # 从新编号检索
-#catia.readExcel()
-#print rename_batch_outfile_name
-#os.system(rename_batch_outfile_name)
-raw_input("Enter enter key to exit...") 
+        
+catia = Catia('arguments.txt')
+catia.createCATScript()
+raw_input("Enter enter key to exit...")

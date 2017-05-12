@@ -1,0 +1,20 @@
+*debug_directory: 脚本文件生成目录。
+F:\GitHub\catia\debug\
+
+*titleblock_script_template_file_name: 标题栏模板脚本文件。
+F:\GitHub\catia\GB_Titleblock.CATScript
+
+*excel_file_name: 命名excel文件。
+F:\GitHub\catia\name_space.xlsx
+
+*catia_root_directory_dict: 存放catia文件的“根”目录（1.老目录，2.新目录，两个目录可以相同）。
+F:\Temp\catia\3\M01\,F:\Temp\catia\3\M01\
+
+*catia_root_directory_dict: 
+F:\Temp\catia\3\M02\,F:\Temp\catia\3\M02\
+
+*rename: 选择哪一列作为老目录的索引？如为 1 则使用‘原始编号’列，如为 0 则使用‘三维文件名称’列。
+0
+
+*web_url: 网站地址，不用修改。
+47.93.195.1

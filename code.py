@@ -7,4 +7,4 @@ Created on Fri May 05 11:06:31 2017
 
 u = u'你好'
 print repr(u)
-print u.encode('gb18030')
+print u.encode('utf-8')
